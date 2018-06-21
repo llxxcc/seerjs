@@ -55,8 +55,8 @@ ChainTypes.impl_object_type = {
 
 ChainTypes.vote_type = {
     committee: 0,
-    witness: 1,
-    worker: 2
+    supervisor: 1,
+    authenticator: 2
 };
 
 ChainTypes.operations = {

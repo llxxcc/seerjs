@@ -14,6 +14,7 @@ var uint8 = types.uint8,
     protocol_id_type = types.protocol_id_type,
     object_id_type = types.object_id_type,
     vote_id = types.vote_id,
+    implementation_id_type = types.implementation_id_type,
     future_extensions = types.future_extensions,
     static_variant = types.static_variant,
     map = types.map,
@@ -249,7 +250,7 @@ export var seer_authenticator_process_operation_fee_parameters = new Serializer(
 
 export var asset_create_market_operation_fee_parameters = new Serializer("asset_create_market_operation_fee_parameters", { first_base: uint64, second_base: uint64 });
 
-var fee_parameters = static_variant([transfer_operation_fee_parameters, limit_order_create_operation_fee_parameters, limit_order_cancel_operation_fee_parameters, fill_order_operation_fee_parameters, account_create_operation_fee_parameters, account_update_operation_fee_parameters, account_whitelist_operation_fee_parameters, account_upgrade_operation_fee_parameters, account_transfer_operation_fee_parameters, asset_create_operation_fee_parameters, asset_update_operation_fee_parameters, asset_issue_operation_fee_parameters, asset_reserve_operation_fee_parameters, asset_fund_fee_pool_operation_fee_parameters, witness_create_operation_fee_parameters, witness_update_operation_fee_parameters, witness_create_collateral_operation_fee_parameters, witness_cancel_collateral_operation_fee_parameters, witness_claim_collateral_operation_fee_parameters, proposal_create_operation_fee_parameters, proposal_update_operation_fee_parameters, proposal_delete_operation_fee_parameters, withdraw_permission_create_operation_fee_parameters, withdraw_permission_update_operation_fee_parameters, withdraw_permission_claim_operation_fee_parameters, withdraw_permission_delete_operation_fee_parameters, committee_member_create_operation_fee_parameters, committee_member_update_operation_fee_parameters, committee_member_update_global_parameters_operation_fee_parameters, vesting_balance_create_operation_fee_parameters, vesting_balance_withdraw_operation_fee_parameters, custom_operation_fee_parameters, assert_operation_fee_parameters, balance_claim_operation_fee_parameters, override_transfer_operation_fee_parameters, transfer_to_blind_operation_fee_parameters, blind_transfer_operation_fee_parameters, transfer_from_blind_operation_fee_parameters, asset_claim_fees_operation_fee_parameters, asset_claim_fees_operation_fee_parameters, seer_oracle_create_fee_parameters, seer_oracle_update_fee_parameters, seer_oracle_input_fee_parameters, seer_room_create_fee_parameters, seer_room_update_fee_parameters, seer_room_input_fee_parameters, seer_room_open_fee_parameters, seer_room_stop_participating_fee_parameters, seer_room_final_fee_parameters, seer_room_settle_fee_parameters, seer_room_participate_fee_parameters, seer_room_close_fee_parameters, seer_room_claim_fee_parameters, seer_house_create_fee_parameters, seer_house_update_fee_parameters, account_authentication_apply_fee_parameters, seer_supervisor_create_operation_fee_parameters, seer_supervisor_update_operation_fee_parameters, seer_supervisor_process_operation_fee_parameters, seer_authenticator_create_operation_fee_parameters, seer_authenticator_update_operation_fee_parameters, seer_authenticator_process_operation_fee_parameters, asset_create_market_operation_fee_parameters]);
+var fee_parameters = static_variant([transfer_operation_fee_parameters, limit_order_create_operation_fee_parameters, limit_order_cancel_operation_fee_parameters, call_order_update_operation_fee_parameters, fill_order_operation_fee_parameters, account_create_operation_fee_parameters, account_update_operation_fee_parameters, account_whitelist_operation_fee_parameters, account_upgrade_operation_fee_parameters, account_transfer_operation_fee_parameters, asset_create_operation_fee_parameters, asset_update_operation_fee_parameters, asset_issue_operation_fee_parameters, asset_reserve_operation_fee_parameters, asset_fund_fee_pool_operation_fee_parameters, witness_create_operation_fee_parameters, witness_update_operation_fee_parameters, witness_create_collateral_operation_fee_parameters, witness_cancel_collateral_operation_fee_parameters, witness_claim_collateral_operation_fee_parameters, proposal_create_operation_fee_parameters, proposal_update_operation_fee_parameters, proposal_delete_operation_fee_parameters, withdraw_permission_create_operation_fee_parameters, withdraw_permission_update_operation_fee_parameters, withdraw_permission_claim_operation_fee_parameters, withdraw_permission_delete_operation_fee_parameters, committee_member_create_operation_fee_parameters, committee_member_update_operation_fee_parameters, committee_member_update_global_parameters_operation_fee_parameters, vesting_balance_create_operation_fee_parameters, vesting_balance_withdraw_operation_fee_parameters, custom_operation_fee_parameters, assert_operation_fee_parameters, balance_claim_operation_fee_parameters, override_transfer_operation_fee_parameters, transfer_to_blind_operation_fee_parameters, blind_transfer_operation_fee_parameters, transfer_from_blind_operation_fee_parameters, asset_settle_cancel_operation_fee_parameters, asset_claim_fees_operation_fee_parameters, seer_oracle_create_fee_parameters, seer_oracle_update_fee_parameters, seer_oracle_input_fee_parameters, seer_room_create_fee_parameters, seer_room_update_fee_parameters, seer_room_input_fee_parameters, seer_room_open_fee_parameters, seer_room_stop_participating_fee_parameters, seer_room_final_fee_parameters, seer_room_settle_fee_parameters, seer_room_participate_fee_parameters, seer_room_close_fee_parameters, seer_room_claim_fee_parameters, seer_house_create_fee_parameters, seer_house_update_fee_parameters]);
 
 export var fee_schedule = new Serializer("fee_schedule", { parameters: set(fee_parameters),
     scale: uint32 });
@@ -506,6 +507,7 @@ export var chain_parameters = new Serializer("chain_parameters", { current_fees:
     maximum_time_until_expiration: uint32,
     maximum_proposal_lifetime: uint32,
     maximum_asset_whitelist_authorities: uint8,
+    maximum_asset_feed_publishers: uint8,
     maximum_authenticator_count: uint16,
     maximum_committee_count: uint16,
     maximum_authority_membership: uint16,
@@ -630,12 +632,12 @@ export var witness_create_collateral = new Serializer("witness_create_collateral
 export var witness_cancel_collateral = new Serializer("witness_cancel_collateral", { fee: asset,
     witness: protocol_id_type("witness"),
     witness_account: protocol_id_type("account"),
-    collateral_id: object_id_type });
+    collateral_id: implementation_id_type("witness_collateral") });
 
 export var witness_claim_collateral = new Serializer("witness_claim_collateral", { fee: asset,
     witness: protocol_id_type("witness"),
     witness_account: protocol_id_type("account"),
-    collateral_id: optional(object_id_type) });
+    collateral_id: optional(implementation_id_type("witness_collateral")) });
 
 export var oracle_create = new Serializer("oracle_create", { fee: asset,
     issuer: protocol_id_type("account"),
@@ -691,62 +693,13 @@ export var seer_room_initial_option = new Serializer("seer_room_initial_option",
     advanced: optional(advanced_special_option)
 });
 
-export var single_participate = new Serializer("single_participate", { player: protocol_id_type("account"),
-    amount: int64,
-    input: array(uint8) });
-
-export var multi_participate = new Serializer("multi_participate", { player: protocol_id_type("account"),
-    amount: int64,
-    input: array(set(uint8)) });
-
-export var multi_participate2 = new Serializer("multi_participate2", { player: protocol_id_type("account"),
-    amount: int64,
-    input: array(array(uint8)) });
-
-export var index = new Serializer("index", { v1: uint32,
-    v2: uint32 });
-
-export var index3 = new Serializer("index3", { v1: int64,
-    v2: int64,
-    v3: int64 });
-
-export var result_of_win = new Serializer("result_of_win", { total_amount: int64,
-    reward_percent: uint64,
-    settle_finished: bytes(3),
-    settled_index: index3,
-    index0: array(uint32),
-    index1: array(index),
-    index2: array(index) });
-
-export var seer_room_option_type3_history = new Serializer("seer_room_option_type3_history", { description: string,
-    owner_result: array(uint8),
-    final_result: array(uint8),
-    oracle_sets: map(protocol_id_type("oracle"), array(uint8)),
-    pool: int64,
-    total_shares: int64,
-    total_participate: map(array(uint8), int64) });
-
-export var seer_room_option_type3 = new Serializer("seer_room_option_type3", { selection_description: array(string),
-    sub_selection_description: array(array(string)),
-    pool: int64,
-    pool_percent_reward: uint16,
-    last_claim_time: time_point_sec,
-    total_shares: int64,
-    range: array(uint8),
-    depth: array(uint8),
-    total_depth: uint8,
-    awards: map(array(uint8), uint32),
-    advanced_awards: map(array(uint8), array(uint32)),
-    participators0: array(single_participate),
-    participators1: array(multi_participate),
-    participators2: array(multi_participate2),
-    finalized_index0: int64,
-    finalized_index1: int64,
-    finalized_index2: int64,
-    winners: map(array(uint8), result_of_win),
-    settled_balance: int64,
-    settled_index: int64,
-    histories: array(seer_room_option_type3_history) });
+export var room_upgrade = new Serializer("room_upgrade", {
+    pvp_owner_percent: optional(uint32),
+    owner_pay_fee_percent: optional(uint32),
+    ext0: optional(uint8),
+    ext1: optional(uint8),
+    ext2: optional(uint8)
+});
 
 export var seer_room_create = new Serializer("seer_room_create", { fee: asset,
     issuer: protocol_id_type("account"),
@@ -756,7 +709,7 @@ export var seer_room_create = new Serializer("seer_room_create", { fee: asset,
     room_type: uint8,
     option: room_option,
     initial_option: optional(seer_room_initial_option),
-    room_type3: optional(uint8),
+    upgrade_option: optional(room_upgrade),
     extensions: set(future_extensions)
 });
 
@@ -768,7 +721,7 @@ export var seer_room_update = new Serializer("seer_room_update", { fee: asset,
     option: optional(room_option),
     new_awards: optional(array(uint64)),
     initial_option: optional(seer_room_initial_option),
-    room_type3: optional(uint8),
+    upgrade_option: optional(room_upgrade),
     extensions: set(future_extensions)
 });
 
@@ -811,7 +764,7 @@ export var seer_room_input = new Serializer("seer_room_input", { fee: asset,
     room: protocol_id_type("room"),
     input: array(uint8) });
 
-export var seer_room_claim = new Serializer("seer_room_claim", { fee: asset,
+export var seer_room_pool = new Serializer("seer_room_pool", { fee: asset,
     issuer: protocol_id_type("account"),
     room: protocol_id_type("room"),
     amount: asset });
@@ -872,7 +825,7 @@ export var seer_authenticator_process = new Serializer("seer_authenticator_proce
     item: protocol_id_type("seer_authentication_item"),
     pass: bool });
 
-operation.st_operations = [transfer, limit_order_create, limit_order_cancel, fill_order, account_create, account_update, account_whitelist, account_upgrade, account_transfer, asset_create, asset_update, asset_issue, asset_reserve, asset_fund_fee_pool, witness_create, witness_update, witness_create_collateral, witness_cancel_collateral, witness_claim_collateral, proposal_create, proposal_update, proposal_delete, withdraw_permission_create, withdraw_permission_update, withdraw_permission_claim, withdraw_permission_delete, committee_member_create, committee_member_update, committee_member_update_global_parameters, vesting_balance_create, vesting_balance_withdraw, custom, assert, balance_claim, override_transfer, transfer_to_blind, blind_transfer, transfer_from_blind, asset_claim_fees, asset_claim_fees, oracle_create, oracle_update, oracle_input, seer_room_create, seer_room_update, seer_room_input, seer_room_open, seer_room_stop_participating, seer_room_final, seer_room_settle, seer_room_participate, seer_room_close, seer_room_claim, seer_house_create, seer_house_update, account_authentication_apply, seer_supervisor_create, seer_supervisor_update, seer_supervisor_process, seer_authenticator_create, seer_authenticator_update, seer_authenticator_process];
+operation.st_operations = [transfer, limit_order_create, limit_order_cancel, fill_order, account_create, account_update, account_whitelist, account_upgrade, account_transfer, asset_create, asset_update, asset_issue, asset_reserve, asset_fund_fee_pool, witness_create, witness_update, witness_create_collateral, witness_cancel_collateral, witness_claim_collateral, proposal_create, proposal_update, proposal_delete, withdraw_permission_create, withdraw_permission_update, withdraw_permission_claim, withdraw_permission_delete, committee_member_create, committee_member_update, committee_member_update_global_parameters, vesting_balance_create, vesting_balance_withdraw, custom, assert, balance_claim, override_transfer, transfer_to_blind, blind_transfer, transfer_from_blind, asset_claim_fees, asset_claim_fees, oracle_create, oracle_update, oracle_input, seer_room_create, seer_room_update, seer_room_input, seer_room_open, seer_room_stop_participating, seer_room_final, seer_room_settle, seer_room_participate, seer_room_close, seer_room_pool, seer_house_create, seer_house_update, account_authentication_apply, seer_supervisor_create, seer_supervisor_update, seer_supervisor_process, seer_authenticator_create, seer_authenticator_update, seer_authenticator_process];
 
 export var transaction = new Serializer("transaction", { ref_block_num: uint16,
     ref_block_prefix: uint32,

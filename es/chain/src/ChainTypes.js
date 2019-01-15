@@ -52,8 +52,8 @@ ChainTypes.impl_object_type = {
 
 ChainTypes.vote_type = {
     committee: 0,
-    supervisor: 1,
-    authenticator: 2
+    witness: 1,
+    worker: 2
 };
 
 ChainTypes.operations = {
@@ -109,7 +109,7 @@ ChainTypes.operations = {
     seer_room_settle: 49,
     seer_room_participate: 50,
     seer_room_close: 51,
-    seer_room_claim: 52,
+    seer_room_pool: 52,
     seer_house_create: 53,
     seer_house_update: 54,
     account_authentication_apply: 55,

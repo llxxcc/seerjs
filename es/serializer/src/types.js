@@ -545,9 +545,64 @@ var id_type = function id_type(reserved_spaces, object_type) {
     };
 };
 
+var impl_id_type = function impl_id_type(reserved_spaces, object_type) {
+    v.required(reserved_spaces, "reserved_spaces");
+    v.required(object_type, "object_type");
+    return {
+        fromByteBuffer: function fromByteBuffer(b) {
+            return b.readVarint32();
+        },
+        appendByteBuffer: function appendByteBuffer(b, object) {
+            v.required(object);
+            if (object.resolve !== undefined) {
+                object = object.resolve;
+            }
+            // convert 1.2.n into just n
+            if (/^[0-9]+\.[0-9]+\.[0-9]+$/.test(object)) {
+                object = v.get_impl_instance(reserved_spaces, object_type, object);
+            }
+            b.writeVarint32(v.to_number(object));
+            return;
+        },
+        fromObject: function fromObject(object) {
+            console.log(111111, reserved_spaces, object_type, object);
+            v.required(object);
+            if (object.resolve !== undefined) {
+                object = object.resolve;
+            }
+            if (v.is_digits(object)) {
+                return v.to_number(object);
+            }
+            return v.get_impl_instance(reserved_spaces, object_type, object);
+        },
+        toObject: function toObject(object) {
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var object_type_id = ChainTypes.impl_object_type[object_type];
+            if (debug.use_default && object === undefined) {
+                return reserved_spaces + "." + object_type_id + ".0";
+            }
+            v.required(object);
+            if (object.resolve !== undefined) {
+                object = object.resolve;
+            }
+            if (/^[0-9]+\.[0-9]+\.[0-9]+$/.test(object)) {
+                object = v.get_impl_instance(reserved_spaces, object_type, object);
+            }
+
+            return reserved_spaces + "." + object_type_id + "." + object;
+        }
+    };
+};
+
 Types.protocol_id_type = function (name) {
     v.required(name, "name");
     return id_type(ChainTypes.reserved_spaces.protocol_ids, name);
+};
+
+Types.implementation_id_type = function (name) {
+    v.required(name, "name");
+    return impl_id_type(ChainTypes.reserved_spaces.implementation_ids, name);
 };
 
 Types.object_id_type = {

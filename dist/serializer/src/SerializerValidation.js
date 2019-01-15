@@ -216,6 +216,34 @@ var _my = {
         return this.to_number(value.split(".")[2]);
     },
 
+    require_impl_object_type: function require_impl_object_type() {
+        var reserved_spaces = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+        var type = arguments[1];
+        var value = arguments[2];
+        var field_name = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
+
+        if (this.is_empty(value)) {
+            return value;
+        }
+        var object_type = _ChainTypes2.default.impl_object_type[type];
+        if (!object_type) {
+            throw new Error("Unknown object type " + type + " " + field_name + " " + value);
+        }
+        var re = new RegExp(reserved_spaces + "." + object_type + ".[0-9]+$");
+        if (!re.test(value)) {
+            throw new Error("Expecting " + type + " in format " + (reserved_spaces + "." + object_type + ".[0-9]+ ") + ("instead of " + value + " " + field_name + " " + value));
+        }
+        return value;
+    },
+
+    get_impl_instance: function get_impl_instance(reserve_spaces, type, value, field_name) {
+        if (this.is_empty(value)) {
+            return value;
+        }
+        this.require_impl_object_type(reserve_spaces, type, value, field_name);
+        return this.to_number(value.split(".")[2]);
+    },
+
     require_relative_type: function require_relative_type(type, value, field_name) {
         this.require_object_type(0, type, value, field_name);
         return value;
